@@ -1,20 +1,29 @@
 import WebSocket from "ws";
 
-// Conectar al servidor WebSocket
+// Pedir el nombre de usuario al iniciar
+const username = prompt("Bienvenido al chat. Por favor, ingresa tu nombre de usuario:");
+
 const client = new WebSocket("ws://localhost:8080");
 
-// Escuchar mensajes del servidor
-client.on("message", (message) => {
-  console.log(`Mensaje recibido del servidor: ${message}`);
-});
-
-// Enviar un mensaje al servidor una vez conectado
 client.on("open", () => {
-  console.log("Conectado al servidor WebSocket.");
-  client.send("¡Hola desde el cliente!");
+  client.send(username);
+  console.log(`Conectado al chat como "${username}".`);
+
+  // Bucle para enviar mensajes desde la terminal
+  (async function chatLoop() {
+    while (true) {
+      const msg = prompt("");
+      if (!msg) continue;
+      client.send(msg);
+    }
+  })();
 });
 
-// Manejar cierre de conexión
+// ✅ Este bloque es clave: mostrar todos los mensajes que llegan
+client.on("message", (data) => {
+  console.log(data.toString());
+});
+
 client.on("close", () => {
   console.log("Conexión cerrada.");
 });
