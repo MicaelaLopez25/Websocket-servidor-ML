@@ -1,10 +1,11 @@
+import chalk from "chalk";
 import { WebSocketServer } from "ws";
 
 // Crear un servidor WebSocket
 const server = new WebSocketServer({ port: 8080 });
 const clients = new Map(); // Map para guardar usuarios por socket
 
-console.log("Servidor WebSocket ejecutándose en ws://localhost:8080");
+console.log(chalk.green("Servidor WebSocket ejecutándose en ws://localhost:8080"));
 
 // Manejar nuevas conexiones
 server.on("connection", (socket) => {
@@ -29,8 +30,13 @@ broadcast(`${username} se ha unido al chat.`, socket); // <- OMITIR al propio so
     }
     console.log(`${username} dijo: ${msg}`); // esto imprime el mjs en el servidor sjfsj
     broadcast(`${username}: ${msg}`);
+ //   console.log(chalk.pink('servidor: el servidor se apagara en 20 minutos'));
     
   });
+  
+  server.on("message", (data) => {
+  console.log(chalk.green(data.toString()))
+});
 
   socket.on("close", () => {
     if (username) {
