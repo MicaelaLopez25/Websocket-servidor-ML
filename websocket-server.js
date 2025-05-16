@@ -34,7 +34,7 @@ broadcast(`${username} se ha unido al chat.`, socket); // <- OMITIR al propio so
 
   socket.on("close", () => {
     if (username) {
-      console.log(`${username} se ha desconectado.`);
+      console.log(`servidor: ${username} se ha desconectado.`);
       clients.delete(socket);
       broadcast(`${username} ha salido del chat.`);
     }
