@@ -1,29 +1,37 @@
 import WebSocket from "ws";
+import readline from "readline";
 
-// Pedir el nombre de usuario al iniciar
-const username = prompt("Bienvenido al chat. Por favor, ingresa tu nombre de usuario:");
-
-const client = new WebSocket("ws://localhost:8080");
-
-client.on("open", () => {
-  client.send(username);
-  console.log(`Conectado al chat como "${username}".`);
-
-  // Bucle para enviar mensajes desde la terminal
-  (async function chatLoop() {
-    while (true) {
-      const msg = prompt("");
-      if (!msg) continue;
-      client.send(msg);
-    }
-  })();
+// Configurar la interfaz de lectura desde la terminal
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
 });
 
-// ✅ Este bloque es clave: mostrar todos los mensajes que llegan
+const client = new WebSocket("ws://localhost:8080");
+let username = null;
+
+client.on("open", () => {
+  rl.question("Bienvenido al chat. Por favor, ingresa tu nombre de usuario: ", (name) => {
+    username = name.trim();
+    client.send(username);
+    promptMessage(); // Comenzar a escuchar mensajes del usuario
+  });
+});
+
 client.on("message", (data) => {
   console.log(data.toString());
 });
 
 client.on("close", () => {
   console.log("Conexión cerrada.");
+  rl.close();
 });
+
+function promptMessage() {
+  rl.question("", (msg) => {
+    if (msg.trim() !== "") {
+      client.send(msg.trim());
+    }
+    promptMessage(); // volver a esperar input
+  });
+}

@@ -15,31 +15,35 @@ server.on("connection", (socket) => {
   socket.send("Bienvenido al chat. Por favor, envía tu nombre de usuario:");
 
   socket.on("message", (message) => {
-    const msg = message.toString();
+    const msg = message.toString().trim();
 
     if (!username) {
       username = msg;
       clients.set(socket, username);
-      socket.send(`Conectado al chat como "${username}".`);
-      console.log(`Usuario conectado: ${username}`);
-      broadcast(`${username} se ha unido al chat.`, socket);
-    } else {
-      broadcast(`${username}: ${msg}`, socket);
+socket.send(`Conectado al chat como "${username}".`);
+console.log(`Usuario conectado: ${username}`);
+broadcast(`${username} se ha unido al chat.`, socket); // <- OMITIR al propio socket
+
+
+      return;
     }
+    console.log(`${username} dijo: ${msg}`); // esto imprime el mjs en el servidor sjfsj
+    broadcast(`${username}: ${msg}`);
+    
   });
 
   socket.on("close", () => {
     if (username) {
       console.log(`${username} se ha desconectado.`);
       clients.delete(socket);
-      broadcast(`${username} ha salido del chat.`, socket);
+      broadcast(`${username} ha salido del chat.`);
     }
   });
 });
 
-function broadcast(message, exceptSocket) {
-  for (const [client] of clients.entries()) {
-    if (client !== exceptSocket && client.readyState === client.OPEN) {
+function broadcast(message, omitSocket = null) {
+  for (const [client] of clients) {
+    if (client !== omitSocket && client.readyState === client.OPEN) {
       client.send(message);
     }
   }
