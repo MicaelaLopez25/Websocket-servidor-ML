@@ -1,11 +1,12 @@
 import chalk from "chalk";
 import { WebSocketServer } from "ws";
+import readline from "readline";
 
 // Crear un servidor WebSocket
 const server = new WebSocketServer({ port: 8080 });
 const clients = new Map(); // Map para guardar usuarios por socket
 
-console.log(chalk.green("Servidor WebSocket ejecutándose en ws://localhost:8080"));
+console.log(chalk.magenta("Servidor WebSocket ejecutándose en ws://localhost:8080"));
 
 // Manejar nuevas conexiones
 server.on("connection", (socket) => {
@@ -54,3 +55,19 @@ function broadcast(message, omitSocket = null) {
     }
   }
 }
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: chalk.magenta("servidor> ")
+});
+
+rl.prompt();
+
+rl.on("line", (input) => {
+  const message = input.trim();
+  if (message) {
+    console.log(chalk.magenta(`servidor (tú): ${message}`));
+    broadcast(chalk.magenta(`💬 Servidor: ${message}`));
+  }
+  rl.prompt();
+});
